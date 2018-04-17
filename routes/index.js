@@ -17,6 +17,8 @@ const router = express.Router();
 const graphHelper = require('../utils/graphHelper.js');
 const emailer = require('../utils/emailer.js');
 const passport = require('passport');
+const auth = require('../utils/auth.js');
+const MicrosoftGraph = require("@microsoft/microsoft-graph-client");
 // ////const fs = require('fs');
 // ////const path = require('path');
 
@@ -24,7 +26,7 @@ const passport = require('passport');
 router.get('/', (req, res) => {
   // check if user is authenticated
   if (!req.isAuthenticated()) {
-    res.render('login');
+    renderCreateAccount(req, res);
   } else {
     renderSendMail(req, res);
   }
@@ -58,6 +60,12 @@ function renderSendMail(req, res) {
   res.render('sendMail', {
     display_name: req.user.profile.displayName,
     email_address: req.user.profile.emails[0].address
+  });
+}
+// Load the sendMail page.
+function renderCreateAccount(req, res) {
+  console.log('renderCreateAccount');
+  res.render('createAccount', {
   });
 }
 
@@ -136,6 +144,56 @@ router.post('/sendMail', (req, res) => {
       }
     });
   });
+});
+
+// Send an email.
+router.post('/createAccount', (req, res) => {
+  console.log('/createAccount');
+
+  const response = res;
+  var userName = 'atestionisx';
+  const postData = {
+    accountEnabled: true,
+    displayName: req.body.firstname + ' ' + req.body.lastname,
+    mailNickname: userName,
+    passwordProfile: {
+      "forceChangePasswordNextSignIn": true,
+      "password": "pass@word1"
+    },
+    userPrincipalName: userName + '@infinitesquare.com'
+  };
+
+
+  auth.getAppOnlyAccessToken().done(function(token) {
+    
+  var client = MicrosoftGraph.Client.init({
+    authProvider: (done) => {
+      console.log('auth provider call');
+        done(null, token); //first parameter takes an error if you can't get an access token 
+    }
+  });
+
+  // Example calling /me with no parameters   
+  client
+  .api('https://graph.microsoft.com/v1.0/users')
+  .post(postData, (err, res2) => {
+    if (err) {
+      console.log('error : ' + err.message);
+      res.status(200);
+      res.redirect('/');
+    }
+    else {
+      console.log('sucesss !');
+      console.log(res2); // prints info about authenticated user 
+      res.status(200);
+      res.redirect('/?ok');
+      }
+  });
+  }
+  , function(r) {
+    console.log('error');
+  });
+
 });
 
 router.get('/disconnect', (req, res) => {

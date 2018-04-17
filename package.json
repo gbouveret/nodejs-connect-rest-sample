@@ -34,14 +34,17 @@
     "uuid": "^3.0.1"
   },
   "devDependencies": {
-    "@types/node":"^8.0.2",
-    "@types/mocha":"^2.2.41",
+    "@microsoft/microsoft-graph-client": "^1.0.0",
+    "@types/mocha": "^2.2.41",
+    "@types/node": "^8.0.2",
+    "adal-node": "^0.1.28",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^14.1.0",
     "eslint-plugin-jsx-a11y": "^4.0.0",
     "gulp": "^3.9.1",
     "gulp-nodemon": "^2.2.1",
     "mocha": "^3.2.0",
+    "q": "^1.5.1",
     "selenium-webdriver": "^3.3.0"
   }
 }
